@@ -141,149 +141,158 @@ export default function App() {
       fromCurrency !== toCurrency;
   };
 
+  function MySeparator() {
+    return (<div className='h-0.5 w-full rounded-full bg-gradient-to-r from-blue-400 to-purple-400 my-4' />)
+  }
+
   return (
-    <div className="w-screen h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-gray-800 p-6 rounded-lg shadow-lg text-white">
-        <h2 className="text-2xl font-bold text-center">Currency Swap</h2>
-        <div className='border-b-2 border-gray-500 my-4' />
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
-          <MyToaster duration={5000} />
+    <div className="w-screen h-screen bg-gray-900 overflow-hidden flex items-center justify-center md:p-0 p-4">
+      <img src={'/images/bgImg.webp'} width={2000} height={2000} className='object-cover w-screen h-screen absolute z-0 top-0 left-0 flex' />
+      <div className='z-10 size-full grid md:grid-cols-2 grid-cols-1'>
+        <div className='col-span-1'></div>
+        <div className="col-span-1 w-full bg-gradient-to-br from-gray-800/90 via-gray-700/90 to-gray-900/90 flex flex-col items-stretch justify-center p-6 md:rounded-tl-3xl md:rounded-bl-3xl rounded-3xl shadow-lg text-white">
+          <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Currency Swap</h2>
+          <MySeparator />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+            <MyToaster duration={5000} />
 
-          {/* From Currency */}
-          <div>
-            <label className="block mb-1 text-sm font-medium">From:</label>
-            <Select
-              onValueChange={(value) => setValue('fromCurrency', value)}
-              value={fromCurrency}
-              disabled={isLoadingRates}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableCurrencies.map((currency) => (
-                  <SelectItem key={currency} value={currency}>
-                    <div className="flex items-center">
-                      <img
-                        src={`/tokens/${currency}.svg`}
-                        alt={currency}
-                        className="w-4 h-4 mr-2"
-                      />
-                      {currency}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.fromCurrency && <span className="text-red-500 text-sm">{errors.fromCurrency.message}</span>}
-          </div>
+            {/* From Currency */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">From:</label>
+              <Select
+                onValueChange={(value) => setValue('fromCurrency', value)}
+                value={fromCurrency}
+                disabled={isLoadingRates}
+              >
+                <SelectTrigger className="w-full bg-gradient-to-r from-gray-700 to-gray-600 border-gray-500">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableCurrencies.map((currency) => (
+                    <SelectItem key={currency} value={currency}>
+                      <div className="flex items-center">
+                        <img
+                          src={`/tokens/${currency}.svg`}
+                          alt={currency}
+                          className="w-4 h-4 mr-2"
+                        />
+                        {currency}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.fromCurrency && <span className="text-red-500 text-sm">{errors.fromCurrency.message}</span>}
+            </div>
 
-          {/* From Amount */}
-          <div>
-            <label className="block mb-1 text-sm font-medium">Amount:</label>
-            <NumericFormat
-              value={`${fromAmount}`}
-              prefix={`${fromCurrency}  | `}
-              onValueChange={(values) => {
-                setValue('fromAmount', Number(values.value));
-              }}
-              allowLeadingZeros={false}
-              allowNegative={false}
-              decimalScale={6}
-              thousandsGroupStyle='thousand'
-              thousandSeparator
-              className="w-full p-2  bg-gray-700 border border-gray-600 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              {...register('fromAmount', {
-                required: 'Amount is required',
-                min: { value: 0.000001, message: 'Minimum amount is 0.000001' }
-              })}
-            />
-            {errors.fromAmount && <span className="text-red-500 text-sm">{errors.fromAmount.message}</span>}
-          </div>
+            {/* From Amount */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">Amount:</label>
+              <NumericFormat
+                value={`${fromAmount}`}
+                prefix={`${fromCurrency}  | `}
+                onValueChange={(values) => {
+                  setValue('fromAmount', Number(values.value));
+                }}
+                allowLeadingZeros={false}
+                allowNegative={false}
+                decimalScale={6}
+                thousandsGroupStyle='thousand'
+                thousandSeparator
+                className="w-full p-2 bg-gradient-to-r from-gray-700 to-gray-600 border border-gray-500 rounded-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                {...register('fromAmount', {
+                  required: 'Amount is required',
+                  min: { value: 0.000001, message: 'Minimum amount is 0.000001' }
+                })}
+              />
+              {errors.fromAmount && <span className="text-red-500 text-sm">{errors.fromAmount.message}</span>}
+            </div>
 
-          {/* Swap Button */}
-          <div className="flex justify-center">
+            {/* Swap Button */}
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleSwapCurrencies}
+                disabled={!fromCurrency || !toCurrency}
+                className="hover:bg-gradient-to-r hover:from-gray-600 hover:to-gray-500 w-12 h-12"
+                title="Swap currencies"
+              >
+                <ArrowUpDown className='!w-10 !h-10  text-purple-400' />
+              </Button>
+            </div>
+
+            {/* To Currency */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">To:</label>
+              <Select
+                onValueChange={(value) => setValue('toCurrency', value)}
+                value={toCurrency}
+                disabled={isLoadingRates}
+              >
+                <SelectTrigger className="w-full bg-gradient-to-r from-gray-700 to-gray-600 border-gray-500">
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableCurrencies.map((currency) => (
+                    <SelectItem
+                      disabled={fromCurrency === currency}
+                      key={currency}
+                      value={currency}
+                    >
+                      <div className="flex items-center">
+                        <img
+                          src={`/tokens/${currency}.svg`}
+                          alt={currency}
+                          className="w-4 h-4 mr-2"
+                        />
+                        {currency}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.toCurrency && <span className="text-red-500 text-sm">{errors.toCurrency.message}</span>}
+            </div>
+
+            {/* To Amount */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">Amount:</label>
+              <NumericFormat
+                disabled={true}
+                value={`${toAmount}`}
+                prefix={`${toCurrency}  | `}
+                allowLeadingZeros={false}
+                allowNegative={false}
+                decimalScale={6}
+                thousandsGroupStyle='thousand'
+                thousandSeparator
+                className="w-full p-2 bg-gradient-to-r from-gray-700 to-gray-600 border border-gray-500 rounded-sm opacity-75"
+                {...register('toAmount')}
+              />
+            </div>
+            <MySeparator />
+            {/* Submit Button */}
             <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={handleSwapCurrencies}
-              disabled={!fromCurrency || !toCurrency}
-              className="hover:bg-gray-700"
-              title="Swap currencies"
+              type="submit"
+              className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 ${isFormValid() && 'cursor-pointer'}`}
+              disabled={!isFormValid()}
+              title="Swap"
             >
-              <ArrowUpDown className='!w-8 !h-8' />
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Swap'
+              )}
             </Button>
-          </div>
-
-          {/* To Currency */}
-          <div>
-            <label className="block mb-1 text-sm font-medium">To:</label>
-            <Select
-              onValueChange={(value) => setValue('toCurrency', value)}
-              value={toCurrency}
-              disabled={isLoadingRates}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableCurrencies.map((currency) => (
-                  <SelectItem
-                    disabled={fromCurrency === currency}
-                    key={currency}
-                    value={currency}
-                  >
-                    <div className="flex items-center">
-                      <img
-                        src={`/tokens/${currency}.svg`}
-                        alt={currency}
-                        className="w-4 h-4 mr-2"
-                      />
-                      {currency}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.toCurrency && <span className="text-red-500 text-sm">{errors.toCurrency.message}</span>}
-          </div>
-
-          {/* To Amount */}
-          <div>
-            <label className="block mb-1 text-sm font-medium">Amount:</label>
-            <NumericFormat
-              disabled={true}
-              value={`${toAmount}`}
-              prefix={`${toCurrency}  | `}
-              allowLeadingZeros={false}
-              allowNegative={false}
-              decimalScale={6}
-              thousandsGroupStyle='thousand'
-              thousandSeparator
-              className="w-full p-2 bg-gray-700 border border-gray-600 rounded-sm opacity-75"
-              {...register('toAmount')}
-            />
-          </div>
-          <div className='border-b-2 border-gray-500 my-4' />
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            className={`w-full hover:bg-gray-500 ${isFormValid() && 'cursor-pointer'}`}
-            disabled={!isFormValid()}
-            title="Swap"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              'Swap'
-            )}
-          </Button>
-        </form>
+          </form>
+        </div>
       </div>
+
     </div>
   );
 }
